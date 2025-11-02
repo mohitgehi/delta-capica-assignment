@@ -1,7 +1,3 @@
-# Mobile PDF Upload, Mock Sign, and Viewer (React + Vite)
-
-Build a mobile-friendly web app where a user uploads a PDF, it is sent to a mock server for “signing,” and the signed PDF is displayed back on the device.
-
 ## Live demo
 
 - Hosted at [delta-capica-test.vercel.app](https://delta-capica-test.vercel.app/)
@@ -16,10 +12,12 @@ Build a mobile-friendly web app where a user uploads a PDF, it is sent to a mock
 ## How it works
 
 1. **Upload**
+
    - The UI provides a file input that accepts `application/pdf`.
    - When a file is selected, it is posted to `/api/sign`.
 
 2. **Mock signing**
+
    - A Service Worker at `public/mock-sw.js` intercepts `POST /api/sign` and simulates signing with a ~1.5s delay.
    - It echoes back the uploaded PDF as a new Blob and adds headers:
      - `Content-Type: application/pdf`
@@ -35,6 +33,7 @@ Build a mobile-friendly web app where a user uploads a PDF, it is sent to a mock
 
 - **React 19 + TypeScript + Vite**
 - **Tailwind CSS v4** for styling
+- **shadcn/ui** component primitives (e.g., Button, Input, theming) — see [shadcn/ui](https://ui.shadcn.com)
 - **Service Worker** to mock the signing endpoint
 
 ## Getting started
@@ -44,9 +43,11 @@ Build a mobile-friendly web app where a user uploads a PDF, it is sent to a mock
    npm install
    ```
 2. Start the dev server:
+
    ```bash
    npm run dev
    ```
+
    - The Service Worker registers automatically on app load (`/mock-sw.js`).
    - Open the printed localhost URL in your browser.
 
@@ -56,28 +57,9 @@ Build a mobile-friendly web app where a user uploads a PDF, it is sent to a mock
    npm run preview
    ```
 
-### Testing on mobile devices
-
-- To access from a phone/tablet on your LAN, run the dev server with host enabled:
-  ```bash
-  npm run dev -- --host
-  ```
-- Service Workers require a secure context (HTTPS) except on `localhost`. When accessing via a LAN IP (e.g., `http://192.168.x.x:5173`), the Service Worker may not register. For an accurate mobile test of the signing flow, use one of:
-  - A local HTTPS dev setup, or
-  - A tunneling solution (e.g., ngrok/Cloudflare Tunnel) to provide HTTPS.
-
-If you just need to verify UI responsiveness on-device, the app UI will still load over HTTP; only the mocked signing endpoint depends on the Service Worker.
-
 ## Project structure (key files)
 
 - `src/components/upload.tsx`: Upload UI and inline viewer (`iframe`).
 - `src/hooks/useUpload.tsx`: Handles POST to `/api/sign`, returns an object URL for the signed PDF.
 - `public/mock-sw.js`: Service Worker that simulates PDF signing and returns the “signed” PDF.
 - `src/main.tsx`: Registers the Service Worker.
-
-## Notes & limitations
-
-- The signing is simulated. The returned file is the original PDF with mock headers; no real cryptographic signing occurs.
-- Files are handled entirely in the browser/Service Worker for this mock; nothing is persisted server-side.
-- Object URLs are revoked on unmount to avoid memory leaks.
-- The inline PDF preview uses an `iframe`. PDF rendering support varies slightly by browser/OS.
